@@ -7,7 +7,15 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export async function addToWaitlist(prevState: any, formData: FormData) {
+interface WaitlistState {
+  success: boolean;
+  message: string;
+}
+
+export async function addToWaitlist(
+  prevState: WaitlistState | null,
+  formData: FormData
+): Promise<WaitlistState> {
   // Add null check for formData
   if (!formData) {
     return {
@@ -26,7 +34,7 @@ export async function addToWaitlist(prevState: any, formData: FormData) {
   }
 
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("waitlist")
       .insert([{ email: email.toLowerCase().trim() }])
       .select();
