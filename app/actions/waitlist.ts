@@ -1,16 +1,16 @@
 "use server";
-
 import { createClient } from "@supabase/supabase-js";
+
+// Define the state type
+interface WaitlistState {
+  success: boolean;
+  message: string;
+}
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
-
-interface WaitlistState {
-  success: boolean;
-  message: string;
-}
 
 export async function addToWaitlist(
   prevState: WaitlistState | null,
@@ -36,8 +36,7 @@ export async function addToWaitlist(
   try {
     const { error } = await supabase
       .from("waitlist")
-      .insert([{ email: email.toLowerCase().trim() }])
-      .select();
+      .insert([{ email: email.toLowerCase().trim() }]);
 
     if (error) {
       if (error.code === "23505") {
@@ -47,6 +46,7 @@ export async function addToWaitlist(
           message: "This email is already on our waitlist!",
         };
       }
+      console.error("Supabase error:", error);
       throw error;
     }
 
